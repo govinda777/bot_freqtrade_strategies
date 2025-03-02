@@ -28,7 +28,7 @@ fi
 
 echo "✅ Imagem Docker encontrada: $IMAGE_NAME"
 
-# 🚀 Passo 4: Iniciar o container em modo interativo para validação
+# 🚀 Passo 4: Iniciar o container temporário para validação
 echo "🚀 Iniciando o container temporário para validação..."
 docker run --name temp_freqtrade -d $IMAGE_NAME /bin/sh -c "while true; do sleep 30; done"
 
@@ -36,7 +36,16 @@ docker run --name temp_freqtrade -d $IMAGE_NAME /bin/sh -c "while true; do sleep
 echo "🔎 Validando arquivos dentro do Docker..."
 docker exec temp_freqtrade ls -l /freqtrade/config.json /freqtrade/user_data/strategies/BuyLowSellHigh.py
 
-# Verificação individual
+# Exibir permissões e dono do arquivo dentro do container
+echo "🔍 Exibindo permissões e dono do arquivo de estratégia..."
+docker exec temp_freqtrade ls -l /freqtrade/user_data/strategies/
+
+# Testar a acessibilidade do arquivo de estratégia
+echo "🔍 Testando permissões de leitura e escrita..."
+docker exec temp_freqtrade sh -c "touch /freqtrade/user_data/strategies/testfile && rm /freqtrade/user_data/strategies/testfile" \
+    && echo "✅ Permissão de escrita OK" || echo "❌ ERRO: Sem permissão de escrita em /freqtrade/user_data/strategies"
+
+# Verificação individual dos arquivos esperados
 if docker exec temp_freqtrade test -f $CONFIG_FILE; then
     echo "✅ Configuração encontrada: $CONFIG_FILE"
 else

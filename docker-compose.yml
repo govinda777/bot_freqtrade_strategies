@@ -8,6 +8,6 @@ services:
     env_file:
       - .env
     volumes:
-      - ./config.json:/freqtrade/config.json:ro  # Read-only para evitar alterações
-      - ./user_data/strategies:/freqtrade/user_data/strategies:rw  # Permitir escrita
+      - ./config.json:/freqtrade/config.json
+      - ./user_data/strategies:/freqtrade/user_data/strategies:rw
     entrypoint: ["bash", "-c", "source /freqtrade/.env && freqtrade trade --config /freqtrade/config.json --strategy BuyLowSellHigh"]
