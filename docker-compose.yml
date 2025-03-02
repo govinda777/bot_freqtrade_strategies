@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  freqtrade:
+    build: .
+    container_name: freqtrade_bot
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./config.json:/freqtrade/config.json
+      - ./user_data/strategies:/freqtrade/user_data/strategies
+    environment:
+      - FREQTRADE__EXCHANGE__NAME=binance
+      - FREQTRADE__EXCHANGE__KEY=${BINANCE_API_KEY}
+      - FREQTRADE__EXCHANGE__SECRET=${BINANCE_SECRET_KEY}
+    command: ["freqtrade", "trade", "--config", "config.json", "--strategy", "BuyLowSellHigh"]
