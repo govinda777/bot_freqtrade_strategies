@@ -1,16 +1,14 @@
-# Usar a imagem oficial do Freqtrade
 FROM freqtradeorg/freqtrade:stable
 
-# Define o diretório de trabalho dentro do container
 WORKDIR /freqtrade
 
-# Copia os arquivos de configuração e estratégia para o container
-COPY config.json /freqtrade/config.json
-COPY user_data/strategies/BuyLowSellHigh.py /freqtrade/user_data/strategies/BuyLowSellHigh.py
-COPY .env /freqtrade/.env
+COPY --chown=ftuser:ftuser config.json config.json
+COPY --chown=ftuser:ftuser user_data/strategies user_data/strategies
+COPY --chown=ftuser:ftuser .env .env
 
-# Instala dependências adicionais, se necessário
-RUN pip install --no-cache-dir -r /freqtrade/requirements.txt || true
+RUN chmod -R 777 /freqtrade/user_data \
+    && pip install --no-cache-dir -r requirements.txt || true
 
-# Executar o bot corretamente
-CMD ["bash", "-c", "source /freqtrade/.env && freqtrade trade --config /freqtrade/config.json --strategy BuyLowSellHigh"]
+# A imagem base já faz ENTRYPOINT ["freqtrade"]
+# Então precisamos passar APENAS o subcomando no CMD:
+CMD ["trade", "--config", "/freqtrade/config.json", "--strategy", "BuyLowSellHigh"]

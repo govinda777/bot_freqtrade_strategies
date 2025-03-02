@@ -7,7 +7,12 @@ services:
     restart: always
     env_file:
       - .env
-    volumes:
-      - ./config.json:/freqtrade/config.json
-      - ./user_data/strategies:/freqtrade/user_data/strategies:rw
-    entrypoint: ["bash", "-c", "source /freqtrade/.env && freqtrade trade --config /freqtrade/config.json --strategy BuyLowSellHigh"]
+    # Removemos o user: "0:0" e os volumes,
+    # pois agora os arquivos já estão dentro da imagem
+    # com permissões ajustadas no Dockerfile.
+    
+    # Se desejar, você pode definir o comando explicitamente:
+    command: >
+      freqtrade trade
+      --config /freqtrade/config.json
+      --strategy BuyLowSellHigh
