@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   freqtrade:
     build: .
@@ -7,12 +5,3 @@ services:
     restart: always
     env_file:
       - .env
-    # Removemos o user: "0:0" e os volumes,
-    # pois agora os arquivos já estão dentro da imagem
-    # com permissões ajustadas no Dockerfile.
-    
-    # Se desejar, você pode definir o comando explicitamente:
-    command: >
-      freqtrade trade
-      --config /freqtrade/config.json
-      --strategy BuyLowSellHigh
