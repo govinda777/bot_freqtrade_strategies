@@ -34,7 +34,7 @@ docker run --name temp_freqtrade -d $IMAGE_NAME /bin/sh -c "while true; do sleep
 
 # 🚀 Passo 5: Verificar arquivos dentro do container
 echo "🔎 Validando arquivos dentro do Docker..."
-docker exec temp_freqtrade ls -l /freqtrade/config.json /freqtrade/user_data/strategies/BuyLowSellHigh.py
+docker exec temp_freqtrade ls -l $CONFIG_FILE $STRATEGY_FILE
 
 # Exibir permissoes e dono do arquivo dentro do container
 echo "🔍 Exibindo permissoes e dono do arquivo de estrategia..."
@@ -90,3 +90,20 @@ if docker exec -it freqtrade_bot touch /freqtrade/user_data/strategies/testfile;
 else
     echo "❌ ERRO: Sem permissao de escrita no container."
 fi
+
+# 📝 Exibir conteúdo do config.json
+echo "🔍 Exibindo conteúdo de /freqtrade/config.json dentro do container:"
+docker exec -it freqtrade_bot cat /freqtrade/config.json
+
+# 🔎 Verificar qual configuração o bot realmente está carregando
+echo "🔎 Verificando a configuração carregada pelo Freqtrade..."
+docker exec -it freqtrade_bot freqtrade show-config
+
+# 📂 Listar **apenas** os arquivos do diretório relevante
+echo "📂 Listando os arquivos dentro de /freqtrade/ para garantir que tudo foi copiado corretamente:"
+docker exec -it freqtrade_bot ls -lah /freqtrade/
+docker exec -it freqtrade_bot ls -lah /freqtrade/user_data/
+docker exec -it freqtrade_bot ls -lah /freqtrade/user_data/strategies/
+
+
+echo "✅ Verificação concluída!"
