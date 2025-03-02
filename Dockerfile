@@ -12,5 +12,5 @@ COPY .env /freqtrade/.env
 # Instala dependências adicionais, se necessário
 RUN pip install --no-cache-dir -r /freqtrade/requirements.txt || true
 
-# Carregar variáveis de ambiente e rodar o bot
-CMD ["sh", "-c", "export $(grep -v '^#' .env | xargs) && freqtrade trade --config config.json --strategy BuyLowSellHigh"]
+# Executar o bot corretamente
+CMD ["bash", "-c", "source /freqtrade/.env && freqtrade trade --config /freqtrade/config.json --strategy BuyLowSellHigh"]

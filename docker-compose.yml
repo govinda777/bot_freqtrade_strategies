@@ -8,10 +8,6 @@ services:
     env_file:
       - .env
     volumes:
-      - ./config.json:/freqtrade/config.json
-      - ./user_data/strategies:/freqtrade/user_data/strategies
-    environment:
-      - FREQTRADE__EXCHANGE__NAME=binance
-      - FREQTRADE__EXCHANGE__KEY=${BINANCE_API_KEY}
-      - FREQTRADE__EXCHANGE__SECRET=${BINANCE_SECRET_KEY}
-    command: ["freqtrade", "trade", "--config", "config.json", "--strategy", "BuyLowSellHigh"]
+      - ./config.json:/freqtrade/config.json:ro  # Read-only para evitar alterações
+      - ./user_data/strategies:/freqtrade/user_data/strategies:rw  # Permitir escrita
+    entrypoint: ["bash", "-c", "source /freqtrade/.env && freqtrade trade --config /freqtrade/config.json --strategy BuyLowSellHigh"]
