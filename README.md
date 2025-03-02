@@ -1,0 +1,1 @@
+# bot_freqtrade_strategies
