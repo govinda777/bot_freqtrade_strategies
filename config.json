@@ -1,91 +1,70 @@
 {
+    "$schema": "https://schema.freqtrade.io/schema.json",
+    "max_open_trades": 3,
+    "stake_currency": "USDT",
+    "stake_amount": 10,
+    "tradable_balance_ratio": 0.99,
+    "fiat_display_currency": "USD",
+    "timeframe": "5m",
+    "dry_run": true,
+    "cancel_open_orders_on_exit": false,
+    "strategy": "BuyLowSellHigh",
+    "unfilledtimeout": {
+        "entry": 10,
+        "exit": 10,
+        "exit_timeout_count": 0,
+        "unit": "minutes"
+    },
+    "entry_pricing": {
+        "price_side": "same",
+        "use_order_book": false,
+        "order_book_top": 5,
+        "price_last_balance": 0.0,
+        "check_depth_of_market": {
+            "enabled": false,
+            "bids_to_ask_delta": 1
+        }
+    },
+    "exit_pricing": {
+        "price_side": "same",
+        "use_order_book": true,
+        "order_book_top": 1
+    },
     "exchange": {
         "name": "binance",
         "key": "${BINANCE_API_KEY}",
         "secret": "${BINANCE_SECRET_KEY}",
-        "pair_whitelist": ["BTC/USDT"],
-        "stake_currency": "USDT",
-        "apiKey": "${BINANCE_API_KEY}",
-        "password": "",
-        "uid": "",
-        "enable_ws": true,
-        "log_responses": false,
-        "markets_refresh_interval": 60
-    },
-    "dry_run": true,
-    "loglevel": "INFO",
-    "strategy": "BuyLowSellHigh",
-    "timeframe": "1h",
-    "max_open_trades": 5,
-    "stake_amount": "unlimited",
-    "tradable_balance_ratio": 0.99,
-    "last_stake_amount_min_ratio": 0.5,
-    "order_types": {
-        "entry": "limit",
-        "exit": "limit",
-        "stoploss": "limit",
-        "emergency_exit": "market",
-        "stoploss_on_exchange": false,
-        "stoploss_on_exchange_force": false
-    },
-    "order_time_in_force": {
-        "entry": "GTC",
-        "exit": "GTC"
-    },
-    "minimal_roi": {
-        "0": 0.05
-    },
-    "stoploss": -0.10,
-    "trailing_stop": true,
-    "trailing_stop_positive": 0.02,
-    "trailing_stop_positive_offset": 0.0,
-    "trailing_only_offset_is_reached": false,
-    "use_exit_signal": true,
-    "exit_profit_only": false,
-    "ignore_roi_if_entry_signal": false,
-    "exit_pricing": {
-        "price_mode": "static",
-        "price_side": "ask",
-        "use_order_book": false
-    },
-    "entry_pricing": {
-        "price_mode": "static",
-        "price_side": "bid",
-        "use_order_book": false
+        "ccxt_config": {},
+        "ccxt_async_config": {},
+        "pair_whitelist": [
+            "BTC/USDT"
+        ],
+        "pair_blacklist": [
+            "BNB/.*"
+        ]
     },
     "pairlists": [
-        {
-            "method": "StaticPairList",
-            "pairs": ["BTC/USDT"]
-        }
+        {"method": "StaticPairList"}
     ],
-    "dry_run_wallet": 1000,
-    "internals": {},
-    "dataformat_ohlcv": "feather",
-    "dataformat_trades": "feather",
-    "config_files": ["/freqtrade/config.json"],
-    "verbosity": 0,
-    "print_colorized": true,
-    "runmode": "dry_run",
-    "db_url": "sqlite:///tradesv3.dryrun.sqlite",
-    "user_data_dir": "/freqtrade/user_data",
-    "datadir": "/freqtrade/user_data/data/binance",
-    "exportfilename": "/freqtrade/user_data/backtest_results",
-    "candle_type_def": "spot",
-    "trading_mode": "spot",
-    "margin_mode": "",
-    "pairs": ["BTC/USDT"],
-    "use_custom_stoploss": false,
-    "process_only_new_candles": true,
-    "startup_candle_count": 0,
-    "exit_profit_offset": 0.0,
-    "disable_dataframe_checks": false,
-    "ignore_buying_expired_candle_after": 0,
-    "position_adjustment_enable": false,
-    "max_entry_position_adjustment": -1,
-    "amend_last_stake_amount": false,
-    "cancel_open_orders_on_exit": false,
-    "reduce_df_footprint": false,
-    "minimum_trade_amount": 10,
-    "targeted_trade_amount": 20
+    "telegram": {
+        "enabled": false,
+        "token": "your_telegram_token",
+        "chat_id": "your_telegram_chat_id"
+    },
+    "api_server": {
+        "enabled": false,
+        "listen_ip_address": "127.0.0.1",
+        "listen_port": 8080,
+        "verbosity": "error",
+        "jwt_secret_key": "somethingrandom",
+        "CORS_origins": [],
+        "username": "freqtrader",
+        "password": "SuperSecurePassword"
+    },
+    "bot_name": "freqtrade",
+    "initial_state": "running",
+    "force_entry_enable": false,
+    "internals": {
+        "process_throttle_secs": 5
+    }
 }
