@@ -52,14 +52,14 @@
         "chat_id": "your_telegram_chat_id"
     },
     "api_server": {
-        "enabled": false,
-        "listen_ip_address": "127.0.0.1",
+        "enabled": true,
+        "listen_ip_address": "0.0.0.0",
         "listen_port": 8080,
         "verbosity": "error",
-        "jwt_secret_key": "somethingrandom",
-        "CORS_origins": [],
-        "username": "freqtrader",
-        "password": "SuperSecurePassword"
+        "jwt_secret_key": "7e5b9c1e9c7b172db460cfd9a24d9c5f6d94bac280c5440892814c9467a343a6",
+        "CORS_origins": ["*"],
+        "username": "govinda777",
+        "password": "Zsrq6k_x3qi3MpJw"
     },
     "bot_name": "freqtrade",
     "initial_state": "running",

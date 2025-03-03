@@ -2,6 +2,8 @@ docker run --rm -it --entrypoint /bin/sh bot_freqtrade_strategies-freqtrade
 
 # 🤖 Freqtrade - Buy Low Sell High Bot
 
+https://www.freqtrade.io/en/stable/
+
 Este repositório fornece um **bot de trading automático** para negociação de criptomoedas, utilizando a estratégia **"Buy Low, Sell High"**. O bot é baseado no [Freqtrade](https://www.freqtrade.io/) e roda dentro de um **container Docker**, facilitando a instalação e execução.
 
 ## 🚀 Recursos do Bot

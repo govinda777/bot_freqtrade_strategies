@@ -16,11 +16,12 @@ docker rm $CONTAINER_NAME 2>/dev/null || true
 echo "🔍 Exportando variáveis de ambiente..."
 export $(grep -v '^#' .env | xargs)
 
-if [[ -z "$BINANCE_API_KEY" || -z "$BINANCE_SECRET_KEY" ]]; then
-    echo "❌ ERRO: As variáveis de ambiente não estão definidas!"
+# 🔍 Verificação de variáveis críticas
+if [[ -z "$BINANCE_API_KEY" || -z "$BINANCE_SECRET_KEY" || -z "$FREQTRADE_USERNAME" || -z "$FREQTRADE_PASSWORD" || -z "$JWT_SECRET_KEY" ]]; then
+    echo "❌ ERRO: Algumas variáveis de ambiente não estão definidas! Verifique o arquivo .env."
     exit 1
 else
-    echo "✅ Variáveis de ambiente carregadas."
+    echo "✅ Variáveis de ambiente carregadas corretamente."
 fi
 
 # 🚀 Passo 3: Construir a imagem novamente
