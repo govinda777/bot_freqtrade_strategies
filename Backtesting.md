@@ -1,11 +1,14 @@
 # 📊 Backtesting da Estratégia "Buy Low, Sell High" no Freqtrade
 
+./stop_bot.sh 
+
+./run_bot.sh 
 
 docker exec -it freqtrade_bot freqtrade download-data --days 60 -p BTC/USDT -t 5m
 
-docker exec -it freqtrade_bot freqtrade hyperopt --strategy BuyLowSellHigh --spaces roi stoploss trailing --timerange 20250201-20250301 --hyperopt-loss SharpeHyperOptLoss --epochs 70 --job-workers 1
+docker exec -it freqtrade_bot freqtrade hyperopt --strategy CombinedBinHAndCluc --spaces roi stoploss trailing --timerange 20250101-20250301 --hyperopt-loss SharpeHyperOptLoss --epochs 70 --job-workers 1
 
-docker exec -it freqtrade_bot freqtrade backtesting --strategy BuyLowSellHigh --timerange 20250102-20250301 --export trades
+docker exec -it freqtrade_bot freqtrade backtesting --strategy CombinedBinHAndCluc --timerange 20250102-20250301 --export trades
 
 ---
 

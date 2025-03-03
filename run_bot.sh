@@ -5,7 +5,7 @@ CONTAINER_NAME="freqtrade_bot"
 
 # Caminhos esperados dentro do container
 CONFIG_FILE="/freqtrade/config.json"
-STRATEGY_FILE="/freqtrade/user_data/strategies/BuyLowSellHigh.py"
+STRATEGY_FILE="/freqtrade/user_data/strategies/CombinedBinHAndCluc.py"
 
 # 🚀 Passo 1: Parar o container se estiver rodando
 echo "🔄 Parando o container existente..."
@@ -28,19 +28,23 @@ fi
 echo "⚙️  Construindo a imagem Docker..."
 docker-compose build --no-cache
 
-# 🚀 Passo 4: Identificar o nome correto da imagem gerada
+# 🚀 Passo 4: Remover cache de estratégias para garantir atualização
+echo "🗑️  Removendo cache de estratégias..."
+rm -rf /freqtrade/user_data/strategies/__pycache__
+
+# 🚀 Passo 5: Identificar o nome correto da imagem gerada
 IMAGE_NAME=$(docker images --format "{{.Repository}}" | grep 'bot_freqtrade_strategies' | head -n 1)
 
 if [ -z "$IMAGE_NAME" ]; then
-    echo "❌ ERRO: A imagem Docker 'bot_freqtrade_strategies' nao foi encontrada. Algo deu errado no build."
-    echo "🔎 Imagens disponiveis:"
+    echo "❌ ERRO: A imagem Docker 'bot_freqtrade_strategies' não foi encontrada. Algo deu errado no build."
+    echo "🔎 Imagens disponíveis:"
     docker images
     exit 1
 fi
 
 echo "✅ Imagem Docker encontrada: $IMAGE_NAME"
 
-# 🚀 Passo 5: Iniciar o container temporário para validação
+# 🚀 Passo 6: Iniciar o container temporário para validação
 echo "🚀 Iniciando o container temporário para validação..."
 docker run --name temp_freqtrade -d $IMAGE_NAME /bin/sh -c "while true; do sleep 30; done"
 
@@ -74,11 +78,11 @@ else
     exit 1
 fi
 
-# 🚀 Passo 6: Removendo container temporário
+# 🚀 Passo 7: Removendo container temporário
 echo "🪚 Removendo container temporário..."
 docker stop temp_freqtrade && docker rm temp_freqtrade
 
-# 🚀 Passo 7: Iniciar o bot
+# 🚀 Passo 8: Iniciar o bot
 echo "🚀 Iniciando o bot Freqtrade..."
 docker-compose up -d
 

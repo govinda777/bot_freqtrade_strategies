@@ -12,4 +12,4 @@ RUN chmod -R 777 /freqtrade/user_data \
     && pip install --no-cache-dir -r requirements.txt || true
 
 # Definir o comando padrão no Dockerfile
-CMD ["trade", "--config", "/freqtrade/config.json", "--strategy", "BuyLowSellHigh"]
+CMD ["trade", "--config", "/freqtrade/config.json", "--strategy", "CombinedBinHAndCluc"]
