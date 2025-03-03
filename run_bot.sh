@@ -111,5 +111,3 @@ docker exec -it freqtrade_bot ls -lah /freqtrade/user_data/strategies/
 echo "📌 Para verificar os logs, execute: docker logs -f freqtrade_bot"
 
 echo "✅ Verificação concluída!"
-
-docker logs -f freqtrade_bot
