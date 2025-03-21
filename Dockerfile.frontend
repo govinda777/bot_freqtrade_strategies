@@ -1,0 +1,50 @@
+FROM node:18 AS builder
+
+WORKDIR /app
+
+# Copiar arquivos de configuração do frontend
+COPY frontend/package*.json ./
+COPY frontend/tsconfig.json ./
+COPY frontend/.babelrc ./
+COPY frontend/webpack.config.js ./
+
+# Instalar dependências
+RUN npm ci
+
+# Copiar código fonte
+COPY frontend/src ./src
+COPY frontend/public ./public
+
+# Configurar o build para ser compatível com GitHub Pages
+RUN sed -i 's|publicPath: \"/\"|publicPath: \"./\"|g' webpack.config.js
+
+# Build da aplicação frontend
+RUN npm run build
+
+# Estágio 2: Servidor web leve para servir a aplicação
+FROM nginx:alpine
+
+# Copiar arquivos de build
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Configuração do Nginx para SPA
+RUN echo 'server { \
+    listen 80; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html index.htm; \
+        try_files $uri $uri/ /index.html; \
+    } \
+    # Proxy para a API (quando executando com o backend) \
+    location /api { \
+        proxy_pass http://backend:8080; \
+        proxy_http_version 1.1; \
+        proxy_set_header Upgrade $http_upgrade; \
+        proxy_set_header Connection "upgrade"; \
+        proxy_set_header Host $host; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

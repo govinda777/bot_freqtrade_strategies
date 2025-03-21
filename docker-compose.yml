@@ -1,9 +1,38 @@
+version: '3.8'
+
 services:
-  freqtrade:
-    build: .
-    container_name: freqtrade_bot
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: freqtrade_backend
     restart: always
     env_file:
       - .env
+    environment:
+      - FREQTRADE_UI=1
     ports:
       - "8080:8080"
+    volumes:
+      - freqtrade_data:/freqtrade/user_data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8080/api/v1/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: freqtrade_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  freqtrade_data:
+    driver: local

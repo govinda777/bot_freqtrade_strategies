@@ -1,0 +1,28 @@
+services:
+  # Web service configuration
+  - type: web
+    name: freqtrade-bot
+    env: docker
+    region: oregon # ou escolha a região mais próxima
+    plan: standard # Escolha o plano adequado
+    branch: main
+    dockerCommand: freqtrade trade --config /freqtrade/config.json --strategy ${FREQTRADE_STRATEGY}
+    numInstances: 1
+    healthCheckPath: /api/v1/ping # Freqtrade health check endpoint
+    envVars:
+      - key: FREQTRADE_STRATEGY
+        value: CombinedBinHAndCluc
+      - key: BINANCE_API_KEY
+        sync: false
+      - key: BINANCE_SECRET_KEY
+        sync: false
+      - key: FREQTRADE_USERNAME
+        sync: false
+      - key: FREQTRADE_PASSWORD
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+    disk:
+      name: freqtrade-data
+      mountPath: /freqtrade/user_data
+      sizeGB: 10
