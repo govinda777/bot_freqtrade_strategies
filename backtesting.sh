@@ -1,8 +1,14 @@
 #!/bin/bash
 
+# Verificar se um nome de estratégia foi fornecido como argumento
+if [ "$1" != "" ]; then
+    STRATEGY_NAME="$1"
+else
+    STRATEGY_NAME="CombinedBinHAndCluc"  # Valor padrão se nenhum for fornecido
+fi
+
 # Definir variáveis
 CONTAINER_NAME="freqtrade_bot"
-STRATEGY_NAME="CombinedBinHAndCluc"
 TIMEFRAME="5m"
 PAIRS="BTC/USDT,ETH/USDT,BNB/USDT,SOL/USDT,XRP/USDT"
 DAYS=120
@@ -12,12 +18,14 @@ TIMERANGE_HYPEROPT="20240101-20250301"
 TIMERANGE_BACKTEST="20240101-20250301"
 BACKTEST_LOG="backtest_result.log"
 
+echo "✅ Usando estratégia: $STRATEGY_NAME"
+
 # 🔹 1) Parar e reiniciar o bot (sem exibir logs)
 echo "🛑 Parando o bot..."
 ./stop_bot.sh
 
-echo "🚀 Reiniciando o bot..."
-./run_bot.sh
+echo "🚀 Reiniciando o bot com estratégia $STRATEGY_NAME..."
+./run_bot.sh "$STRATEGY_NAME"
 if [ $? -ne 0 ]; then
     echo "❌ ERRO: O bot não iniciou corretamente. Abortando backtest."
     exit 1

@@ -11,5 +11,8 @@ COPY --chown=ftuser:ftuser .env .env
 RUN chmod -R 777 /freqtrade/user_data \
     && pip install --no-cache-dir -r requirements.txt || true
 
-# Definir o comando padrão no Dockerfile
-CMD ["trade", "--config", "/freqtrade/config.json", "--strategy", "CombinedBinHAndCluc"]
+# Definir variável de ambiente para a estratégia (padrão se não for especificada)
+ENV FREQTRADE_STRATEGY="CombinedBinHAndCluc"
+
+# Usar a variável de ambiente para definir a estratégia
+CMD ["sh", "-c", "freqtrade trade --config /freqtrade/config.json --strategy ${FREQTRADE_STRATEGY}"]

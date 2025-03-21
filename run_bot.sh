@@ -1,11 +1,23 @@
 #!/bin/bash
 
+# Verificar se um nome de estratégia foi fornecido como argumento
+if [ "$1" != "" ]; then
+    STRATEGY_NAME="$1"
+else
+    STRATEGY_NAME="CombinedBinHAndCluc"  # Valor padrão se nenhum for fornecido
+fi
+
 # Nome do container
 CONTAINER_NAME="freqtrade_bot"
 
 # Caminhos esperados dentro do container
 CONFIG_FILE="/freqtrade/config.json"
-STRATEGY_FILE="/freqtrade/user_data/strategies/CombinedBinHAndCluc.py"
+STRATEGY_FILE="/freqtrade/user_data/strategies/${STRATEGY_NAME}.py"
+
+echo "✅ Usando estratégia: $STRATEGY_NAME (arquivo: $STRATEGY_FILE)"
+
+# Exportar variável de ambiente para uso no docker-compose e no container
+export FREQTRADE_STRATEGY=$STRATEGY_NAME
 
 # 🚀 Passo 1: Parar o container se estiver rodando
 echo "🔄 Parando o container existente..."
