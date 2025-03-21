@@ -1,126 +1,54 @@
-name: CI/CD Pipeline
+name: Main Orchestrator Workflow
 
 on:
   push:
     branches: [ main, master ]
+    paths-ignore:
+      - 'frontend/**'
+      - 'user_data/**'
+      - 'Dockerfile.frontend'
+      - 'Dockerfile.backend'
+      - '.github/workflows/frontend.yml'
+      - '.github/workflows/backend.yml'
   pull_request:
     branches: [ main, master ]
+    paths-ignore:
+      - 'frontend/**'
+      - 'user_data/**'
+      - 'Dockerfile.frontend'
+      - 'Dockerfile.backend'
+      - '.github/workflows/frontend.yml'
+      - '.github/workflows/backend.yml'
 
 jobs:
-  build-and-test-frontend:
+  trigger-frontend-workflow:
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: frontend
-        
     steps:
       - uses: actions/checkout@v3
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Trigger Frontend Workflow
+        uses: peter-evans/repository-dispatch@v2
         with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      
-      - name: Install Dependencies
-        run: npm ci
-      
-      - name: Run Tests
-        run: npm test
-      
-      - name: Update Webpack Config for GitHub Pages
-        run: |
-          sed -i 's|publicPath: "/"|publicPath: "./"|g' webpack.config.js
-      
-      - name: Build Frontend
-        run: npm run build
-      
-      - name: Upload Frontend Build
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-build
-          path: frontend/dist
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: trigger-frontend-workflow
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
   
-  deploy-to-github-pages:
+  trigger-backend-workflow:
     runs-on: ubuntu-latest
-    needs: build-and-test-frontend
-    if: github.event_name != 'pull_request'
-    
     steps:
       - uses: actions/checkout@v3
       
-      - name: Download Frontend Build
-        uses: actions/download-artifact@v3
+      - name: Trigger Backend Workflow
+        uses: peter-evans/repository-dispatch@v2
         with:
-          name: frontend-build
-          path: ./dist
-      
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: ./dist
-          branch: gh-pages
-          clean: true
-  
-  build-and-push-docker:
-    runs-on: ubuntu-latest
-    needs: build-and-test-frontend
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Download Frontend Build
-        uses: actions/download-artifact@v3
-        with:
-          name: frontend-build
-          path: frontend/dist
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      
-      - name: Login to Docker Hub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      
-      - name: Build and Push Backend Docker Image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile.backend
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/freqtrade-backend:latest
-            ${{ secrets.DOCKER_USERNAME }}/freqtrade-backend:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      
-      - name: Build and Push Frontend Docker Image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile.frontend
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/freqtrade-frontend:latest
-            ${{ secrets.DOCKER_USERNAME }}/freqtrade-frontend:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-  
-  deploy-to-render:
-    runs-on: ubuntu-latest
-    needs: build-and-push-docker
-    if: github.event_name != 'pull_request'
-    
-    steps:
-      - name: Deploy to Render
-        uses: JorgeLNJunior/render-deploy@v1.4.3
-        with:
-          service_id: ${{ secrets.RENDER_SERVICE_ID }}
-          api_key: ${{ secrets.RENDER_API_KEY }}
-          wait_deploy: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: trigger-backend-workflow
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+
+# Note: Frontend and Backend pipelines are now separated into their own workflow files:
+# - Frontend pipeline: .github/workflows/frontend.yml
+# - Backend pipeline: .github/workflows/backend.yml
+#
+# This main workflow serves as an orchestrator that can trigger both pipelines
+# when necessary. Each pipeline can also be triggered independently based on 
+# specific file changes relevant to that component.
