@@ -5,14 +5,22 @@ WORKDIR /freqtrade
 # Copia os arquivos com permissões adequadas
 COPY --chown=ftuser:ftuser config.json config.json
 COPY --chown=ftuser:ftuser user_data/strategies user_data/strategies
-COPY --chown=ftuser:ftuser .env .env
+
+# Variáveis de compilação (build args)
+ARG FREQTRADE_STRATEGY=CombinedBinHAndCluc
+
+# Configura variáveis de ambiente para API e autenticação
+# Esses valores serão substituídos em tempo de execução pelos valores reais
+ENV BINANCE_API_KEY=""
+ENV BINANCE_SECRET_KEY=""
+ENV FREQTRADE_USERNAME=""
+ENV FREQTRADE_PASSWORD=""
+ENV JWT_SECRET_KEY=""
+ENV FREQTRADE_STRATEGY=${FREQTRADE_STRATEGY}
 
 # Ajusta permissões e instala dependências (se necessário)
 RUN chmod -R 777 /freqtrade/user_data \
     && pip install --no-cache-dir -r requirements.txt || true
-
-# Definir variável de ambiente para a estratégia (padrão se não for especificada)
-ENV FREQTRADE_STRATEGY="CombinedBinHAndCluc"
 
 # Habilitar a interface web do Freqtrade
 ENV FREQTRADE_UI="1"

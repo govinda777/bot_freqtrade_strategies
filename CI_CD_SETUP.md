@@ -18,21 +18,36 @@ O pipeline de CI/CD configurado realiza as seguintes ações:
 
 ## Configuração do GitHub
 
-### Secrets do GitHub
+### Variáveis e Secrets do GitHub
 
-Você precisa configurar os seguintes secrets no seu repositório GitHub:
+Você precisa configurar corretamente as variáveis e secrets no seu repositório GitHub para garantir que as informações sensíveis estejam protegidas:
 
 1. Vá para seu repositório > Settings > Secrets and variables > Actions
-2. Adicione os seguintes secrets:
 
-| Nome do Secret | Descrição |
-|---------------|-----------|
-| `DOCKER_USERNAME` | Seu nome de usuário do Docker Hub |
-| `DOCKER_TOKEN` | Token de acesso pessoal do Docker Hub |
-| `RENDER_API_KEY` | API Key do Render.com (obtida no dashboard do Render) |
-| `RENDER_SERVICE_ID` | ID do serviço criado no Render.com |
+2. Na aba **Secrets**, adicione os seguintes valores sensíveis:
+
+| Nome do Secret | Descrição | Justificativa |
+|---------------|-----------|---------------|
+| `BINANCE_API_KEY` | Sua chave de API da Binance | Informação sensível que pode comprometer sua conta |
+| `BINANCE_SECRET_KEY` | Sua chave secreta da Binance | Informação crítica que permite transações em seu nome |
+| `DOCKER_USERNAME` | Seu nome de usuário do Docker Hub | Usado em autenticação, deve ser protegido |
+| `DOCKER_TOKEN` | Token de acesso pessoal do Docker Hub | Credencial sensível para acesso ao Docker Hub |
+| `FREQTRADE_PASSWORD` | Senha para o Freqtrade | Credencial de autenticação sensível |
+| `JWT_SECRET_KEY` | Chave secreta para geração de JWT | Chave criptográfica que não deve ser exposta |
+| `GITHUB_TOKEN_PAT` | Token pessoal do GitHub (se usado) | Permite acesso ao seu repositório GitHub |
+| `RENDER_API_KEY` | API Key do Render.com | Permite acesso administrativo ao seu serviço Render |
+| `RENDER_SERVICE_ID` | ID do serviço criado no Render.com | Identificador do seu serviço |
+
+3. Na aba **Variables**, adicione os seguintes valores não-sensíveis:
+
+| Nome da Variável | Descrição | Justificativa |
+|---------------|-----------|---------------|
+| `STRATEGY_NAME` | Nome da estratégia a ser executada | Valor não-sensível que controla qual estratégia é usada |
+| `FREQTRADE_USERNAME` | Nome de usuário para o Freqtrade | Valor menos sensível que pode ser armazenado como variável |
 
 > **Nota sobre autenticação do Docker Hub**: Este projeto utiliza autenticação com Docker Hub via tokens de acesso pessoal para maior segurança. Para detalhes sobre como configurar, consulte [DOCKER_HUB_AUTH.md](DOCKER_HUB_AUTH.md).
+
+> **Importante**: Os arquivos de workflow estão configurados para referenciar o DOCKER_USERNAME como um secret. Certifique-se de configurá-lo como secret, não como variável, para manter a compatibilidade com os workflows existentes.
 
 ## Configuração do Render.com
 
