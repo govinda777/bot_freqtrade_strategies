@@ -28,9 +28,11 @@ Você precisa configurar os seguintes secrets no seu repositório GitHub:
 | Nome do Secret | Descrição |
 |---------------|-----------|
 | `DOCKER_USERNAME` | Seu nome de usuário do Docker Hub |
-| `DOCKER_PASSWORD` | Sua senha do Docker Hub ou token de acesso |
+| `DOCKER_TOKEN` | Token de acesso pessoal do Docker Hub |
 | `RENDER_API_KEY` | API Key do Render.com (obtida no dashboard do Render) |
 | `RENDER_SERVICE_ID` | ID do serviço criado no Render.com |
+
+> **Nota sobre autenticação do Docker Hub**: Este projeto utiliza autenticação com Docker Hub via tokens de acesso pessoal para maior segurança. Para detalhes sobre como configurar, consulte [DOCKER_HUB_AUTH.md](DOCKER_HUB_AUTH.md).
 
 ## Configuração do Render.com
 
