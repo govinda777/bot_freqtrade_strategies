@@ -1,0 +1,33 @@
+# valores específicos para o cliente 002
+clientId: "cliente-002"
+clientSchema: "cliente_002"
+
+# Configuração da API de exchange (Binance)
+binance:
+  existingSecretName: "binance-credentials-cliente-002"
+
+# Configurações específicas do Freqtrade para este cliente
+freqtrade:
+  mode: "trade"
+  dryRun: true  # Modo paper trading para este cliente
+  strategy: "NostalgiaForInfinity"
+  maxOpenTrades: 3
+  stakeCurrency: "USDT"
+  stakeAmount: 50
+  timeframe: "15m"
+  exposureLevel: "conservador"
+
+# Pares para trading
+tradingPairs:
+  - "BTC/USDT"
+  - "ETH/USDT"
+  - "BNB/USDT"
+
+# Recursos para este cliente específico
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi

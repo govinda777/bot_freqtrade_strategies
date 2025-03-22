@@ -1,0 +1,71 @@
+# Valores padrão para o chart do Freqtrade
+# Este arquivo define configurações compartilhadas por todos os bots
+
+# Configurações da imagem
+image:
+  repository: freqtradeorg/freqtrade
+  tag: stable
+  pullPolicy: IfNotPresent
+
+# Configurações gerais
+nameOverride: ""
+fullnameOverride: ""
+
+# Configurações do serviço
+service:
+  type: ClusterIP
+  port: 8080
+
+# Recursos padrão para os pods
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+# Configurações do banco de dados
+database:
+  host: postgresql.database.svc.cluster.local
+  port: 5432
+  name: freqtrade_multi
+  user: freqtrade
+  existingSecretName: ""
+  existingSecretKey: ""
+
+# Valores padrão para o Freqtrade
+freqtrade:
+  # Tipo de execução: trade ou backtest
+  mode: trade
+  dryRun: true
+  strategy: "CombinedBinHAndCluc"
+  tradingMode: spot
+  maxOpenTrades: 3
+  stakeCurrency: "USDT"
+  stakeAmount: 100
+  timeframe: "5m"
+  fiatDisplayCurrency: "USD"
+  # Nível de exposição: conservador, moderado, ousado
+  exposureLevel: moderado
+
+# Configurações de liveness e readiness probes
+livenessProbe:
+  httpGet:
+    path: /api/v1/ping
+    port: 8080
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  httpGet:
+    path: /api/v1/ping
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1

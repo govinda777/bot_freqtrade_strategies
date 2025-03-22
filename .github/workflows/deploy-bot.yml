@@ -1,0 +1,146 @@
+name: Deploy Bot
+
+on:
+  push:
+    paths:
+      - 'clientes/**/*.yaml'
+      - 'charts/**/*'
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      client_id:
+        description: 'ID do cliente para deploy'
+        required: true
+        type: string
+
+jobs:
+  validate:
+    name: Validate Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.10.0'
+
+      - name: Lint Helm Chart
+        run: |
+          helm lint ./infra/charts/freqtrade
+
+  deploy:
+    name: Deploy Bot
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.25.0'
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name freqtrade-cluster --region us-east-1
+
+      - name: Deploy with ArgoCD
+        run: |
+          # Determinar qual cliente implantar
+          CLIENT_ID="${{ github.event.inputs.client_id }}"
+          if [ -z "$CLIENT_ID" ]; then
+            # Se o evento foi um push, identificar quais arquivos values.yaml foram alterados
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'clientes/.*/values.yaml' || echo "")
+            if [ -n "$CHANGED_FILES" ]; then
+              # Extrair os IDs dos clientes dos caminhos dos arquivos alterados
+              for file in $CHANGED_FILES; do
+                client_dir=$(dirname $file)
+                CLIENT_ID=$(basename $client_dir)
+                echo "Detectado alteração para cliente: $CLIENT_ID"
+                
+                # Aplicar a configuração do cliente via ArgoCD
+                kubectl apply -f <(cat <<EOF
+                apiVersion: argoproj.io/v1alpha1
+                kind: Application
+                metadata:
+                  name: freqtrade-$CLIENT_ID
+                  namespace: argocd
+                spec:
+                  project: default
+                  source:
+                    repoURL: ${{ github.server_url }}/${{ github.repository }}.git
+                    targetRevision: ${{ github.sha }}
+                    path: infra/charts/freqtrade
+                    helm:
+                      valueFiles:
+                        - ../../clientes/$CLIENT_ID/values.yaml
+                  destination:
+                    server: https://kubernetes.default.svc
+                    namespace: freqtrade
+                  syncPolicy:
+                    automated:
+                      prune: true
+                      selfHeal: true
+                    syncOptions:
+                      - CreateNamespace=true
+                EOF
+                )
+                
+                echo "Aplicação ArgoCD criada para o cliente $CLIENT_ID"
+              done
+            else
+              echo "Nenhum arquivo values.yaml de cliente foi alterado."
+            fi
+          else
+            # Se um client_id foi especificado manualmente, implantar apenas para este cliente
+            echo "Implantando para o cliente especificado: $CLIENT_ID"
+            
+            # Verificar se o diretório do cliente existe
+            if [ -d "clientes/$CLIENT_ID" ]; then
+              kubectl apply -f <(cat <<EOF
+              apiVersion: argoproj.io/v1alpha1
+              kind: Application
+              metadata:
+                name: freqtrade-$CLIENT_ID
+                namespace: argocd
+              spec:
+                project: default
+                source:
+                  repoURL: ${{ github.server_url }}/${{ github.repository }}.git
+                  targetRevision: ${{ github.sha }}
+                  path: infra/charts/freqtrade
+                  helm:
+                    valueFiles:
+                      - ../../clientes/$CLIENT_ID/values.yaml
+                destination:
+                  server: https://kubernetes.default.svc
+                  namespace: freqtrade
+                syncPolicy:
+                  automated:
+                    prune: true
+                    selfHeal: true
+                  syncOptions:
+                    - CreateNamespace=true
+              EOF
+              )
+              
+              echo "Aplicação ArgoCD criada para o cliente $CLIENT_ID"
+            else
+              echo "Erro: Diretório do cliente $CLIENT_ID não encontrado em clientes/"
+              exit 1
+            fi
+          fi

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: freqtrade
+description: Helm chart para implantação de bots Freqtrade em ambiente multi-tenant
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Equipe DevOps
+    email: devops@example.com

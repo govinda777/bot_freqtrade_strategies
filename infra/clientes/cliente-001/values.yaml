@@ -1,0 +1,35 @@
+# valores específicos para o cliente 001
+clientId: "cliente-001"
+clientSchema: "cliente_001"
+
+# Configuração da API de exchange (Binance)
+binance:
+  existingSecretName: "binance-credentials-cliente-001"
+
+# Configurações específicas do Freqtrade para este cliente
+freqtrade:
+  mode: "trade"
+  dryRun: false
+  strategy: "CombinedBinHAndCluc"
+  maxOpenTrades: 5
+  stakeCurrency: "USDT"
+  stakeAmount: 100
+  timeframe: "5m"
+  exposureLevel: "moderado"
+
+# Pares para trading
+tradingPairs:
+  - "BTC/USDT"
+  - "ETH/USDT"
+  - "ADA/USDT"
+  - "SOL/USDT"
+  - "DOT/USDT"
+
+# Recursos para este cliente específico
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi

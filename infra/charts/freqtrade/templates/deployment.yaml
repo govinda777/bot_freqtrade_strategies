@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "freqtrade.fullname" . }}
+  labels:
+    {{- include "freqtrade.labels" . | nindent 4 }}
+    mode: {{ .Values.freqtrade.mode }}
+    client-id: {{ .Values.clientId | default "unknown" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "freqtrade.selectorLabels" . | nindent 6 }}
+      mode: {{ .Values.freqtrade.mode }}
+      client-id: {{ .Values.clientId | default "unknown" }}
+  template:
+    metadata:
+      labels:
+        {{- include "freqtrade.selectorLabels" . | nindent 8 }}
+        mode: {{ .Values.freqtrade.mode }}
+        client-id: {{ .Values.clientId | default "unknown" }}
+    spec:
+      initContainers:
+        - name: init-schema
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - /scripts/init-schema.sh
+          env:
+            - name: DATABASE_URL
+              value: postgresql://{{ .Values.database.user }}:$(DB_PASSWORD)@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}?search_path={{ .Values.clientSchema }}
+            - name: CLIENT_SCHEMA
+              value: {{ .Values.clientSchema }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.database.existingSecretName | default (include "freqtrade.fullname" .) }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - {{ .Values.freqtrade.mode }}
+            {{- if eq .Values.freqtrade.mode "trade" }}
+            {{- if .Values.freqtrade.dryRun }}
+            - --dry-run
+            {{- end }}
+            {{- end }}
+            - --db-url=postgresql://{{ .Values.database.user }}:$(DB_PASSWORD)@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}?search_path={{ .Values.clientSchema }}
+            - --strategy={{ .Values.freqtrade.strategy }}
+          env:
+            - name: BINANCE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.binance.existingSecretName | default (include "freqtrade.fullname" .) }}
+                  key: api-key
+            - name: BINANCE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.binance.existingSecretName | default (include "freqtrade.fullname" .) }}
+                  key: secret-key
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.existingSecretName | default (include "freqtrade.fullname" .) }}
+                  key: {{ .Values.database.existingSecretKey | default "postgresql-password" }}
+            - name: MAX_OPEN_TRADES
+              value: "{{ .Values.freqtrade.maxOpenTrades }}"
+            - name: STAKE_CURRENCY
+              value: "{{ .Values.freqtrade.stakeCurrency }}"
+            - name: STAKE_AMOUNT
+              value: "{{ .Values.freqtrade.stakeAmount }}"
+            - name: TIMEFRAME
+              value: "{{ .Values.freqtrade.timeframe }}"
+            - name: FIAT_DISPLAY_CURRENCY
+              value: "{{ .Values.freqtrade.fiatDisplayCurrency }}"
+            - name: CLIENT_ID
+              value: "{{ .Values.clientId }}"
+            - name: EXPOSURE_LEVEL
+              value: "{{ .Values.freqtrade.exposureLevel }}"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: user-data
+              mountPath: /freqtrade/user_data
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ include "freqtrade.fullname" . }}-scripts
+            defaultMode: 0755
+        - name: user-data
+          persistentVolumeClaim:
+            claimName: {{ include "freqtrade.fullname" . }}-user-data
