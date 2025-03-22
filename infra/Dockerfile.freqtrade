@@ -1,0 +1,33 @@
+# /Users/gosouza/projetos-p/bot_freqtrade_strategies/infra/Dockerfile.freqtrade
+
+FROM freqtradeorg/freqtrade:stable
+
+# Define o diretório de trabalho
+WORKDIR /freqtrade
+
+# Copia arquivos principais
+COPY --chown=ftuser:ftuser config.json /freqtrade/config.json
+COPY --chown=ftuser:ftuser user_data/strategies /freqtrade/user_data/strategies
+COPY --chown=ftuser:ftuser infra/healthcheck-freqtrade.sh /freqtrade/scripts/healthcheck-freqtrade.sh
+
+# Ajusta permissões e instala dependências (se necessário)
+RUN chmod -R 777 /freqtrade/user_data /freqtrade/scripts \
+    && if [ -f /freqtrade/requirements.txt ]; then \
+         pip install --no-cache-dir -r /freqtrade/requirements.txt; \
+       fi
+
+# Variáveis sobrescrevíveis via ENV ou Docker Compose
+ENV FREQTRADE_STRATEGY="CombinedBinHAndCluc"
+ENV HEALTH_CHECK_INTERVAL=600
+ENV FREQTRADE_UI="1"
+
+EXPOSE 8080
+
+USER ftuser
+
+# Inicia o Freqtrade e roda o script de healthcheck periodicamente em segundo plano
+CMD sh -c "\
+    echo '🚀 Iniciando Freqtrade com estratégia $FREQTRADE_STRATEGY' && \
+    chmod +x /freqtrade/scripts/healthcheck-freqtrade.sh && \
+    /freqtrade/scripts/healthcheck-freqtrade.sh >> /freqtrade/log_health.log 2>&1 & \
+    freqtrade trade --config /freqtrade/config.json --strategy ${FREQTRADE_STRATEGY} --enable-inotify"

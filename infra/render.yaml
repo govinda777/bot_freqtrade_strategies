@@ -1,0 +1,63 @@
+# render.yaml
+apiVersion: 1
+services:
+  # 1) Banco de dados PostgreSQL gerenciado
+  - type: psql
+    name: freqtrade-db
+    plan: starter      # Escolha o plano que desejar (starter, standard, etc.)
+    # region: oregon   # (opcional) especifique a região se quiser
+    # engineVersion: 14  # Versão do PostgreSQL, se quiser definir
+
+  # 2) Serviço Web rodando Freqtrade
+  - type: web
+    name: freqtrade-bot
+    env: docker
+    region: oregon              # ou outra região suportada (ex: frankfurt)
+    plan: standard              # ou outro plano
+    branch: main                # branch do repositório
+    buildCommand: ""            # se quiser customizar o processo de build do Docker
+    dockerCommand: >
+      freqtrade trade
+      --config /freqtrade/config.json
+      --strategy ${FREQTRADE_STRATEGY}
+    numInstances: 1
+    healthCheckPath: /api/v1/ping   # Freqtrade expõe /api/v1/ping se "api_server.enabled": true no config.json
+
+    # psqlDatabases faz a vinculação com o banco freqtrade-db, injetando credenciais no container.
+    psqlDatabases:
+      - name: freqtrade-db
+
+    envVars:
+      # Estratégia desejada
+      - key: FREQTRADE_STRATEGY
+        value: CombinedBinHAndCluc
+
+      # Chaves da corretora (sincronização manual = false para não sobrescrever)
+      - key: BINANCE_API_KEY
+        sync: false
+      - key: BINANCE_SECRET_KEY
+        sync: false
+
+      # Usuário e senha da API do Freqtrade (caso habilite /api)
+      - key: FREQTRADE_USERNAME
+        sync: false
+      - key: FREQTRADE_PASSWORD
+        sync: false
+
+      # JWT secreto para proteger a API do Freqtrade
+      - key: JWT_SECRET_KEY
+        sync: false
+
+      # (Opcional) Se você quiser montar a URL de conexão ao DB como POSTGRES_URL
+      # para usar no config.json, pode fazer:
+      # - key: POSTGRES_URL
+      #   fromDatabase:
+      #     name: freqtrade-db
+      #     property: connectionString
+
+    # Cria um disco persistente dentro do Web Service para /freqtrade/user_data
+    # Útil se você quiser baixar dados (download-data) ou armazenar logs localmente.
+    disk:
+      name: freqtrade-data
+      mountPath: /freqtrade/user_data
+      sizeGB: 10

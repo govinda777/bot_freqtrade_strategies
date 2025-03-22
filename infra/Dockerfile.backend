@@ -1,0 +1,39 @@
+# Dockerfile.backend
+
+FROM freqtradeorg/freqtrade:stable
+
+# Diretório de trabalho
+WORKDIR /freqtrade
+
+# ARG: usado apenas em tempo de build.
+ARG FREQTRADE_STRATEGY=CombinedBinHAndCluc
+
+# Copia config e estratégias, preservando permissões de ftuser
+COPY --chown=ftuser:ftuser config.json /freqtrade/config.json
+COPY --chown=ftuser:ftuser user_data/strategies /freqtrade/user_data/strategies
+
+# Se tiver um arquivo de dependências (opcional):
+# COPY --chown=ftuser:ftuser requirements.txt /freqtrade/requirements.txt
+
+# Define variáveis de ambiente sobrescrevíveis no runtime
+ENV BINANCE_API_KEY=""
+ENV BINANCE_SECRET_KEY=""
+ENV FREQTRADE_USERNAME=""
+ENV FREQTRADE_PASSWORD=""
+ENV JWT_SECRET_KEY=""
+ENV FREQTRADE_STRATEGY=${FREQTRADE_STRATEGY}
+ENV FREQTRADE_UI="1"
+
+# Ajusta permissões e instala dependências (se houver requirements.txt).
+# Use '|| true' para não falhar se não existir ou estiver vazio.
+RUN chmod -R 777 /freqtrade/user_data \
+    && if [ -f /freqtrade/requirements.txt ]; then pip install --no-cache-dir -r /freqtrade/requirements.txt; fi
+
+# Expondo a porta para acessar API/Interface
+EXPOSE 8080
+
+# Opcional: trocar para o usuário ftuser por segurança
+USER ftuser
+
+# Comando default. Usa a var de estratégia e habilita inotify para reload automático.
+CMD ["sh", "-c", "freqtrade trade --config /freqtrade/config.json --strategy ${FREQTRADE_STRATEGY} --enable-inotify"]
