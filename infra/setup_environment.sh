@@ -16,6 +16,7 @@ cleanup() {
   echo "Removendo arquivos temporários do Terraform..."
   rm -rf "$TERRAFORM_DIR/.terraform"
   rm -f "$TERRAFORM_DIR/.terraform.lock.hcl"
+  rm -f "$TERRAFORM_DIR/terraform.tfstate"
 
   echo "Cleanup concluído."
 }
