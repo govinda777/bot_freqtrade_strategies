@@ -20,6 +20,15 @@ resource "aws_iam_role" "eks_node_group" {
     Terraform   = "true"
   }
 }
+resource "aws_iam_role_policy_attachment" "eks_node_group_admin" {
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  role       = aws_iam_role.eks_node_group.name
+}
+
+resource "aws_iam_role_policy_attachment" "argocd_admin" {
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  role       = aws_iam_role.argocd.name
+}
 
 # Políticas para os nós do EKS
 resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
