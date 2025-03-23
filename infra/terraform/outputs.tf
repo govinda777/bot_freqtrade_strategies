@@ -1,21 +1,21 @@
 output "cluster_id" {
   description = "ID do cluster EKS"
-  value       = module.eks.cluster_id
+  value       = try(module.eks[0].cluster_id, "")
 }
 
 output "cluster_endpoint" {
   description = "Endpoint do cluster EKS"
-  value       = module.eks.cluster_endpoint
+  value       = try(module.eks[0].cluster_endpoint, "")
 }
 
 output "cluster_security_group_id" {
   description = "ID do security group do cluster EKS"
-  value       = module.eks.cluster_security_group_id
+  value       = try(module.eks[0].cluster_security_group_id, "")
 }
 
 output "kubectl_config" {
   description = "Comando para configurar o kubectl"
-  value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_id}"
+  value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${try(module.eks[0].cluster_id, "")}"
 }
 
 output "rds_endpoint" {

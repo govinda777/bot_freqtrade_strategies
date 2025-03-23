@@ -46,7 +46,7 @@ resource "aws_db_instance" "freqtrade" {
   db_name                = "freqtrade_multi"
   username               = "freqtrade_admin"
   password               = var.db_password
-  db_subnet_group_name   = aws_db_subnet_group.freqtrade.name
+  db_subnet_group_name   = aws_db_subnet_group.freqtrade[0].name
   vpc_security_group_ids = [aws_security_group.rds.id]
   parameter_group_name   = "default.postgres14"
   publicly_accessible    = false
