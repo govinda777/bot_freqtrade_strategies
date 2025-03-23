@@ -1,4 +1,5 @@
 module "eks" {
+  count = var.use_localstack ? 0 : 1
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 18.0"
 

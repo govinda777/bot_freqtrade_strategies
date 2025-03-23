@@ -1,7 +1,7 @@
 variable "use_localstack" {
   description = "Whether to use LocalStack (true) to disable unsupported AWS services resources creation."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "environment" {

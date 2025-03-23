@@ -1,4 +1,5 @@
 resource "aws_db_subnet_group" "freqtrade" {
+  count       = var.use_localstack ? 0 : 1
   name       = "freqtrade-${var.environment}"
   subnet_ids = module.vpc.private_subnets
 
