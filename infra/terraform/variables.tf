@@ -1,29 +1,32 @@
-variable "aws_region" {
-  description = "Região AWS onde os recursos serão criados"
-  type        = string
-  default     = "us-east-1"
+variable "use_localstack" {
+  description = "Whether to use LocalStack (true) to disable unsupported AWS services resources creation."
+  type        = bool
+  default     = false
 }
 
 variable "environment" {
-  description = "Ambiente (desenvolvimento, staging, produção)"
+  description = "Deployment environment (e.g. development, production)"
   type        = string
   default     = "development"
 }
 
 variable "cluster_name" {
-  description = "Nome do cluster EKS"
+  description = "Name of the EKS cluster"
   type        = string
   default     = "freqtrade-cluster"
 }
+variable "aws_region" {
+  description = "AWS region to use"
+  type        = string
+}
 
 variable "db_password" {
-  description = "Senha para o banco de dados RDS"
+  description = "Database password for the database"
   type        = string
   sensitive   = true
 }
 
 variable "allowed_cidr_blocks" {
-  description = "CIDR blocks permitidos para conectar ao cluster"
+  description = "List of allowed CIDR blocks"
   type        = list(string)
-  default     = ["0.0.0.0/0"]
 }

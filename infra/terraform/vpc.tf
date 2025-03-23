@@ -12,8 +12,8 @@ module "vpc" {
   enable_nat_gateway   = true
   single_nat_gateway   = var.environment != "production"
   enable_dns_hostnames = true
-  manage_default_network_acl = var.environment == "development" ? true : false
-
+  manage_default_network_acl = var.use_localstack ? false : (var.environment == "development" ? true : false)
+  
   public_subnet_tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     "kubernetes.io/role/elb"                    = "1"
