@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 3.0"
+  version = "~> 3.22.0"
 
   name = "freqtrade-vpc-${var.environment}"
   cidr = "10.0.0.0/16"
