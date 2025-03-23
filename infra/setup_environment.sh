@@ -41,7 +41,7 @@ export AWS_SECRET_ACCESS_KEY=test
 export AWS_DEFAULT_REGION=us-east-1
 
 # Defina a variável de ambiente TF_VAR_db_password com o valor desejado
-export TF_VAR_db_password="sua_senha_segura"
+export TF_VAR_db_password=$TF_VAR_db_password
 
 echo "Executando 'terraform init'..."
 terraform -chdir="$TERRAFORM_DIR" init
