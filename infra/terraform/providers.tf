@@ -63,11 +63,15 @@ provider "aws" {
   access_key   = local.is_development ? "test" : null
   secret_key   = local.is_development ? "test" : null
   profile      = local.is_development ? null : "admin"
+  skip_credentials_validation = local.is_development ? true : false
   dynamic "endpoints" {
     for_each = local.is_development ? [1] : []
     content {
-      ec2 = "http://localhost:4566"
-      sts = "http://localhost:4566"
+      ec2            = "http://localhost:4566"
+      sts            = "http://localhost:4566"
+      iam            = "http://localhost:4566"
+      rds            = "http://localhost:4566"
+      cloudwatchlogs = "http://localhost:4566"
     }
   }
 }
