@@ -30,7 +30,13 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region                      = "us-east-1"
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  endpoints {
+    ec2 = "http://localhost:4566"
+    sts = "http://localhost:4566"
+  }
 }
 
 provider "kubernetes" {
@@ -45,4 +51,12 @@ provider "helm" {
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
     token                  = data.aws_eks_cluster_auth.cluster.token
   }
+}
+
+data "aws_eks_cluster" "cluster" {
+  name = var.cluster_name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = var.cluster_name
 }

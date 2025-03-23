@@ -44,7 +44,7 @@ export AWS_DEFAULT_REGION=us-east-1
 export TF_VAR_db_password=$TF_VAR_db_password
 
 echo "Executando 'terraform init'..."
-terraform -chdir="$TERRAFORM_DIR" init
+terraform -chdir="$TERRAFORM_DIR" init -upgrade
 
 echo "Executando 'terraform apply'..."
 terraform -chdir="$TERRAFORM_DIR" apply -auto-approve
