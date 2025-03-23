@@ -38,6 +38,7 @@ resource "aws_security_group" "rds" {
 }
 
 resource "aws_db_instance" "freqtrade" {
+  count                = var.use_localstack ? 0 : 1
   identifier             = "freqtrade-${var.environment}"
   allocated_storage      = 20
   engine                 = "postgres"
@@ -46,7 +47,7 @@ resource "aws_db_instance" "freqtrade" {
   db_name                = "freqtrade_multi"
   username               = "freqtrade_admin"
   password               = var.db_password
-  db_subnet_group_name   = aws_db_subnet_group.freqtrade[0].name
+  db_subnet_group_name   = try(aws_db_subnet_group.freqtrade[0].name, "")
   vpc_security_group_ids = [aws_security_group.rds.id]
   parameter_group_name   = "default.postgres14"
   publicly_accessible    = false
@@ -62,17 +63,18 @@ resource "aws_db_instance" "freqtrade" {
 
 # Cria um secret no Kubernetes com as credenciais do RDS
 resource "kubernetes_secret" "rds_credentials" {
+  count = var.use_localstack ? 0 : 1
   metadata {
     name      = "freqtrade-db-credentials"
     namespace = "freqtrade"
   }
 
   data = {
-    username = aws_db_instance.freqtrade.username
-    password = aws_db_instance.freqtrade.password
-    host     = aws_db_instance.freqtrade.address
-    port     = aws_db_instance.freqtrade.port
-    dbname   = aws_db_instance.freqtrade.db_name
+    username = aws_db_instance.freqtrade[0].username
+    password = aws_db_instance.freqtrade[0].password
+    host     = aws_db_instance.freqtrade[0].address
+    port     = aws_db_instance.freqtrade[0].port
+    dbname   = aws_db_instance.freqtrade[0].db_name
   }
 
   type = "Opaque"

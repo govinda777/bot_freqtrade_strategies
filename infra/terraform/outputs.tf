@@ -20,20 +20,20 @@ output "kubectl_config" {
 
 output "rds_endpoint" {
   description = "Endpoint da instância RDS"
-  value       = aws_db_instance.freqtrade.address
+  value       = aws_db_instance.freqtrade[0].address
 }
 
 output "rds_port" {
   description = "Porta da instância RDS"
-  value       = aws_db_instance.freqtrade.port
+  value       = aws_db_instance.freqtrade[0].port
 }
 
 output "rds_username" {
   description = "Usuário da instância RDS"
-  value       = aws_db_instance.freqtrade.username
+  value       = aws_db_instance.freqtrade[0].username
 }
 
 output "rds_database_name" {
   description = "Nome do banco de dados RDS"
-  value       = aws_db_instance.freqtrade.db_name
+  value       = aws_db_instance.freqtrade[0].db_name
 }
