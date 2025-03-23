@@ -42,6 +42,7 @@ export AWS_DEFAULT_REGION=us-east-1
 
 # Defina a variável de ambiente TF_VAR_db_password com o valor desejado
 export TF_VAR_db_password=$TF_VAR_db_password
+export LOCALSTACK_API_KEY=$LOCALSTACK_API_KEY
 
 echo "Executando 'terraform init'..."
 terraform -chdir="$TERRAFORM_DIR" init -upgrade

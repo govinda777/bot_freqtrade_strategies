@@ -2,6 +2,21 @@ Perfeito! Com base no seu stack e nos fluxos que discutimos, aqui está uma **ar
 
 ---
 
+Requisito:
+
+LocalStack Pro : 
+
+LocalStack Pro é a versão comercial do LocalStack que oferece suporte para serviços adicionais da AWS – como RDS e EKS – que não estão implementados na versão gratuita. Isso significa que, para criar recursos como RDS e EKS no ambiente local, é necessário rodar a versão Pro do LocalStack e configurar as chaves de acesso adequadas (por exemplo, definindo a variável de ambiente LOCALSTACK_API_KEY).
+
+---
+
+Env variables:
+
+LOCALSTACK_API_KEY
+
+
+---
+
 # 🏗️ Arquitetura de Infraestrutura – `bot_freqtrade_strategies`
 
 ---
