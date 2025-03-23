@@ -344,11 +344,11 @@ stateDiagram-v2
 ```mermaid
 graph TD
     subgraph "/infra"
-        A[/infra]
-        B[/charts]
-        C[/terraform]
-        D[/clientes]
-        E[/.github]
+        A[infra]
+        B[charts]
+        C[terraform]
+        D[clientes]
+        E[.github]
         
         A --> B
         A --> C
@@ -356,11 +356,11 @@ graph TD
         A --> E
         A --> ArgoApp[argocd-application.yaml]
         
-        B --> Freqtrade[/freqtrade]
+        B --> Freqtrade[freqtrade]
         Freqtrade --> ChartFile[Chart.yaml]
         Freqtrade --> ValuesFile[values.yaml]
-        Freqtrade --> Templates[/templates]
-        Freqtrade --> Scripts[/scripts]
+        Freqtrade --> Templates[templates]
+        Freqtrade --> Scripts[scripts]
         
         Templates --> DeploymentFile[deployment.yaml]
         Templates --> ServiceFile[service.yaml]
@@ -375,14 +375,14 @@ graph TD
         C --> VarsFile[variables.tf]
         C --> OutputsFile[outputs.tf]
         
-        D --> Cliente1[/cliente-001]
-        D --> Cliente2[/cliente-002]
+        D --> Cliente1[cliente-001]
+        D --> Cliente2[cliente-002]
         D --> ClienteDots[...]
         
         Cliente1 --> Values1[values.yaml]
         Cliente2 --> Values2[values.yaml]
         
-        E --> Workflows[/workflows]
+        E --> Workflows[workflows]
         Workflows --> DeployBot[deploy-bot.yml]
     end
 ```
