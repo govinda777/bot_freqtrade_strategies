@@ -32,8 +32,7 @@ def step_checkov_installed(context):
 @when('o Checkov é executado no diretório "infra/terraform"')
 def step_run_checkov(context):
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))  # até o nível `tests`
-    custom_policy_dir = os.path.join(base_dir, "security", "custom_policies")
-
+    custom_policy_dir = os.path.join(base_dir, "tests", "security", "custom_policies")
     try:
         result = subprocess.run(
             [
