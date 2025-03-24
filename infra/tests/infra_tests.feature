@@ -16,3 +16,22 @@ Funcionalidade: Validação da Infraestrutura
       | infra/terraform/iam.tf              |
       | infra/terraform/main.tf             |
       | infra/terraform/outputs.tf          |
+
+  Cenário: Verificação dos arquivos complementares
+    Dado que o ambiente foi configurado
+    Então os seguintes arquivos devem existir:
+      | caminho                             |
+      | infra/terraform/variables.tf        |
+      | infra/terraform/providers.tf        |
+      | infra/terraform/eks-cluster.tf      |
+      | infra/docker-compose.yml            |
+
+  Cenário: Validação do Terraform Plan
+    Dado que o ambiente foi configurado
+    Quando executar o comando "terraform plan" na pasta "infra/terraform"
+    Então a saída do terraform plan deve conter "No changes. Infrastructure is up-to-date"
+
+  Cenário: Execução do Terraform Apply
+    Dado que o ambiente foi configurado
+    Quando executar o comando "terraform apply" na pasta "infra/terraform" com aprovação automática
+    Então a saída do terraform apply deve conter "Apply complete! Resources:"

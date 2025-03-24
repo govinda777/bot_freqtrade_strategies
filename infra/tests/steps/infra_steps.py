@@ -4,6 +4,8 @@ from behave import given, when, then
 
 @given(u'que o script "./setup_environment.sh" foi executado com sucesso')
 def step_executa_setup(context):
+    if hasattr(context, 'setup_executed') and context.setup_executed:
+        return
     # Calcula o caminho absoluto para o script "setup_environment.sh" relativo ao diretório de steps
     script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "setup_environment.sh"))
     try:
@@ -11,6 +13,7 @@ def step_executa_setup(context):
         context.output = result.stdout
         print("Logs do setup_environment.sh:")
         print(result.stdout)
+        context.setup_executed = True
     except subprocess.CalledProcessError as e:
         assert False, f"Erro ao executar setup_environment.sh: {e.stderr.strip()}"
 
@@ -26,13 +29,16 @@ def step_verifica_saida(context):
 
 @given(u'que o ambiente foi configurado')
 def step_ambiente_configurado_given(context):
-    # Reexecuta o setup para garantir que o ambiente esteja configurado
+    # Reexecuta o setup apenas se não tiver sido executado previamente
+    if hasattr(context, 'setup_executed') and context.setup_executed:
+        return
     script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "setup_environment.sh"))
     try:
         result = subprocess.run(["bash", script_path], check=True, capture_output=True, text=True)
         context.output = result.stdout
         print("Logs do setup_environment.sh:")
         print(result.stdout)
+        context.setup_executed = True
     except subprocess.CalledProcessError as e:
         assert False, "O ambiente não foi configurado."
 
@@ -47,3 +53,35 @@ def step_verifica_arquivos(context):
         full_path = os.path.join(base_path, caminho)
         print("Verificando existência do arquivo:", full_path)
         assert os.path.exists(full_path), f"O arquivo {caminho} não existe em {full_path}."
+
+@when(u'executar o comando "terraform plan" na pasta "infra/terraform"')
+def step_terraform_plan(context):
+    terraform_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "infra", "terraform"))
+    try:
+        result = subprocess.run(["terraform", "plan"], cwd=terraform_dir, check=True, capture_output=True, text=True)
+        context.terraform_plan_output = result.stdout
+        print("Output do terraform plan:")
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        assert False, f"Erro ao executar terraform plan: {e.stderr.strip()}"
+
+@then(u'a saída do terraform plan deve conter "No changes. Infrastructure is up-to-date"')
+def step_verifica_terraform_plan(context):
+    expected = "No changes. Infrastructure is up-to-date"
+    assert expected in context.terraform_plan_output, f"A saída do terraform plan não contém a mensagem esperada. Saída: {context.terraform_plan_output}"
+
+@when(u'executar o comando "terraform apply" na pasta "infra/terraform" com aprovação automática')
+def step_terraform_apply(context):
+    terraform_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "infra", "terraform"))
+    try:
+        result = subprocess.run(["terraform", "apply", "-auto-approve"], cwd=terraform_dir, check=True, capture_output=True, text=True)
+        context.terraform_apply_output = result.stdout
+        print("Output do terraform apply:")
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        assert False, f"Erro ao executar terraform apply: {e.stderr.strip()}"
+
+@then(u'a saída do terraform apply deve conter "Apply complete! Resources:"')
+def step_verifica_terraform_apply(context):
+    expected = "Apply complete! Resources:"
+    assert expected in context.terraform_apply_output, f"A saída do terraform apply não contém a mensagem esperada. Saída: {context.terraform_apply_output}"
