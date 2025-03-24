@@ -41,3 +41,9 @@ Este documento descreve as definições e diretrizes para a execução dos teste
 ## Conclusão
 
 A integração entre Terraform, Helm, ArgoCD e os pipelines CI/CD proporciona um ambiente escalável, seguro e auditável. Estas definições e procedimentos asseguram que a infraestrutura do projeto seja mantida e evolua de forma eficiente.
+
+## Próximos Passos
+
+- Implementar verificação das IAC Policies com Checkov para garantir a conformidade com as melhores práticas de segurança na AWS e Terraform.
+- Desenvolver casos de testes para validar upgrade e downgrade de versões do provider AWS e Terraform, assegurando compatibilidade e reversibilidade dos deployments.
+- Integrar esses testes ao pipeline de CI/CD para execução contínua e feedback imediato.
