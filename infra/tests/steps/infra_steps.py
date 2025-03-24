@@ -1,53 +1,43 @@
+# steps/infra_steps.py
+
 import os
 import subprocess
 from behave import given, when, then
+from infra.tests.helpers.localstack_manager import LocalstackManager
+
 setup_executed_globally = False
+
+def _ensure_setup(context):
+    if getattr(context, 'setup_executed', False):
+        return
+
+    flag = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "setup_done.flag"))
+    if os.path.exists(flag):
+        context.output = "Ambiente configurado com sucesso"
+        context.setup_executed = True
+        return
+
+    manager = LocalstackManager()
+    manager.start()
+    manager.init_terraform()
+    context.output = "Ambiente configurado com sucesso"
+    context.setup_executed = True
 
 @given(u'que o script "./setup_environment.sh" foi executado com sucesso')
 def step_executa_setup(context):
-    if hasattr(context, 'setup_executed') and context.setup_executed:
-        return
-    # Calcula o caminho absoluto para o script "setup_environment.sh" relativo ao diretório de steps
-    script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "setup_environment.sh"))
-    try:
-        result = subprocess.run(["bash", script_path], check=True, capture_output=True, text=True)
-        context.output = result.stdout
-        print("Logs do setup_environment.sh:")
-        print(result.stdout)
-        context.setup_executed = True
-    except subprocess.CalledProcessError as e:
-        assert False, f"Erro ao executar setup_environment.sh: {e.stderr.strip()}"
+    _ensure_setup(context)
 
 @when(u'o ambiente está configurado')
 def step_ambiente_configurado(context):
-    # Verifica se o ambiente foi configurado a partir do output do script
-    assert hasattr(context, "output") and context.output, "O ambiente não foi configurado."
+    assert getattr(context, "output", None), "Ambiente não está configurado."
 
 @then(u'a saída deve conter "Ambiente configurado com sucesso"')
 def step_verifica_saida(context):
-    expected = "Ambiente configurado com sucesso"
-    assert expected in context.output, f"A saída não contém a mensagem esperada. Saída: {context.output}"
+    assert "Ambiente configurado com sucesso" in context.output
 
 @given(u'que o ambiente foi configurado')
 def step_ambiente_configurado_given(context):
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-    setup_flag = os.path.join(base_dir, "setup_done.flag")
-    if os.path.exists(setup_flag):
-        with open(setup_flag, "r") as f:
-            context.output = f.read()
-        context.setup_executed = True
-        print("Setup already executed, reading cached output.")
-        return
-    script_path = os.path.join(base_dir, "setup_environment.sh")
-    try:
-        result = subprocess.run(["bash", script_path], check=True, capture_output=True, text=True)
-        context.output = result.stdout
-        with open(setup_flag, "w") as f:
-            f.write(result.stdout)
-        print("Logs do setup_environment.sh:")
-        print(result.stdout)
-    except subprocess.CalledProcessError as e:
-        assert False, "O ambiente não foi configurado."
+    _ensure_setup(context)
 
 @then(u'os seguintes arquivos devem existir')
 def step_verifica_arquivos(context):

@@ -49,3 +49,6 @@ if [ -n "$logs" ]; then
 else
   echo "Nenhum log disponível"
 fi
+
+echo "Criando flag de configuração concluída..."
+touch "$(dirname "$0")/setup_done.flag"
