@@ -159,7 +159,18 @@ Abra o arquivo `config.json` e ajuste as configurações conforme necessário:
 }
 ```
 
-> 🔹 O `dry_run` está ativado por padrão para evitar perdas. Para operar no modo real, altere `"dry_run": false`.
+> 🔹 O `dry_run` está ativado por padrão para evitar perdas. Para operar no modo real, altere `"dry_run": false.
+
+## 🔧 Instalação do Pre-commit Hook
+
+Para garantir que o ambiente esteja configurado corretamente a cada commit, o repositório inclui um hook de pre-commit que executa o script <code>infra/setup_environment.sh</code>. Se o hook não estiver instalado ou se você estiver configurando o repositório em uma nova máquina, siga os passos abaixo:
+
+1. Verifique se o arquivo <code>.git/hooks/pre-commit</code> existe no repositório.
+2. Torne o hook executável rodando o comando:
+
+   <code>chmod +x .git/hooks/pre-commit</code>
+
+Com esses passos, o hook será executado automaticamente a cada commit. Caso o script <code>infra/setup_environment.sh</code> falhe, o commit será abortado.
 
 ## ▶️ Como Rodar o Bot
 
