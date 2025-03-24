@@ -187,3 +187,7 @@ Se quiser, posso agora:
 ✅ Esboçar a API de backend (Node/Python) que automatiza tudo
 
 Qual dessas partes você quer que eu gere agora?
+
+## Histórico de Atualizações
+
+- 2025-03-24: Documento de infraestrutura atualizado para incluir histórico de atualizações e melhorias na seção de Próximos Passos.

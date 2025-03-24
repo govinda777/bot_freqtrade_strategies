@@ -1,27 +1,43 @@
 # Testes de Infraestrutura
 
-Esta pasta contém os testes automatizados que verificam a integridade da infraestrutura do projeto.
+Este documento descreve as definições e diretrizes para a execução dos testes de infraestrutura do projeto "bot_freqtrade_strategies". Aqui, detalhamos como a infraestrutura funciona e os passos necessários para testar e validar este ambiente.
 
-## Estrutura
+## Definições de Infraestrutura
 
-- **run.sh**: Script para executar todos os testes.
-- **integration/**: Testes de integração para validar a comunicação entre os componentes.
-- **security/**: Testes de segurança, incluindo políticas customizadas.
+1. **Cluster Kubernetes (AWS EKS)**  
+   - Ambiente onde são executados os pods contendo os bots e serviços internos.
+   - Gerenciado via Terraform, com namespaces distintos para "freqtrade" (bots) e "infra" (ferramentas de gerenciamento).
 
-## Como Executar os Testes
+2. **Banco de Dados (AWS RDS - PostgreSQL)**  
+   - Instância única de Postgres com um schema dedicado para cada cliente, garantindo isolamento de dados.
+   - Utiliza o parâmetro "search_path" para direcionar conexões ao schema correto.
 
-1. Certifique-se de que todas as dependências estão instaladas.
-2. Navegue até o diretório <code>infra/tests</code> e execute:
-   <pre>
-   ./run.sh
-   </pre>
-3. Os resultados dos testes serão exibidos no terminal.
+3. **Deploy GitOps com Helm e ArgoCD**  
+   - Configurações de deploy versionadas no Git e aplicadas automaticamente via ArgoCD.
+   - Helm permite templates parametrizáveis para implantações dinâmicas.
 
-## Contribuições
+4. **CI/CD com GitHub Actions**  
+   - Pipelines automatizados que constroem imagens Docker, atualizam arquivos de configuração (como <code>values.yaml</code>) e realizam deploy contínuo.
+   - Integração com ArgoCD para atualizações imediatas no cluster.
 
-- Para adicionar novos testes, crie-os nos diretórios apropriados (<code>integration/</code> ou <code>security/</code>).
-- Siga os padrões estabelecidos nos testes existentes.
+5. **Facade API**  
+   - Ponto central para o processamento de comandos criptografados vindos da blockchain.
+   - Gerencia a configuração dos bots, monitora a saúde dos serviços (por meio de endpoints como <code>/api/v1/ping</code>) e executa operações de approve/rollback conforme necessário.
 
-## Contato
+## Como Testar e Validar a Infraestrutura
 
-Para dúvidas ou sugestões, entre em contato com a equipe de infraestrutura.
+- **Provisionamento com Terraform**  
+  - Execute os scripts (ex.: <code>eks.tf</code>, <code>rds.tf</code>, <code>iam.tf</code>, etc.) para provisionar ou atualizar os recursos na AWS.
+
+- **Monitoramento dos Deployments (ArgoCD)**  
+  - Verifique a interface do ArgoCD para confirmar a sincronização dos deployments e o estado dos pods.
+
+- **Execução dos Pipelines CI/CD**  
+  - Acompanhe os workflows do GitHub Actions para validar a construção das imagens Docker e a atualização dos arquivos de configuração.
+
+- **Testes Automatizados**  
+  - Utilize os scripts e testes automatizados contidos neste diretório (como <code>run.sh</code> e demais testes) para simular cenários de deploy e garantir a integridade do ambiente.
+
+## Conclusão
+
+A integração entre Terraform, Helm, ArgoCD e os pipelines CI/CD proporciona um ambiente escalável, seguro e auditável. Estas definições e procedimentos asseguram que a infraestrutura do projeto seja mantida e evolua de forma eficiente.
