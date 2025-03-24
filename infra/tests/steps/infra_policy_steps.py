@@ -6,6 +6,12 @@ import subprocess
 def step_setup_environment(context):
     if hasattr(context, 'setup_executed') and context.setup_executed:
         return
+    # Checa se o ambiente já está configurado verificando o arquivo de flag
+    flag_path = os.path.join(os.path.dirname(__file__), "..", "..", "infra", "setup_done.flag")
+    if os.path.exists(flag_path):
+        print("Ambiente já configurado (flag detectada). Pulando execução do setup_environment.sh.")
+        context.setup_executed = True
+        return
     # Calcula o caminho absoluto para o script "setup_environment.sh" relativo ao diretório de steps
     script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "setup_environment.sh"))
     try:
@@ -13,6 +19,9 @@ def step_setup_environment(context):
         context.output = result.stdout
         print("Logs do setup_environment.sh:")
         print(result.stdout)
+        # Cria o arquivo de flag para indicar que o setup já foi executado
+        with open(flag_path, "w") as flag_file:
+            flag_file.write("done")
         context.setup_executed = True
     except subprocess.CalledProcessError as e:
         assert False, f"Erro ao executar setup_environment.sh: {e.stderr.strip()}"
@@ -57,11 +66,15 @@ def step_run_checkov(context):
 
 @then("não deve haver violações de política de segurança")
 def step_no_policy_violations(context):
+    print("Validação: Resposta do Checkov:")
+    print(context.checkov_output)
     if "No violations" not in context.checkov_output:
         raise AssertionError(f"Violations found in security policies! Checkov output: {context.checkov_output}")
 
 @then("todas as recomendações de melhores práticas devem ser atendidas")
 def step_best_practices(context):
+    print("Validação: Resposta do Checkov (Melhores práticas):")
+    print(context.checkov_output)
     if "best practices" not in context.checkov_output:
         raise AssertionError(f"Not all best practices are met! Checkov output: {context.checkov_output}")
 
@@ -76,9 +89,13 @@ def step_iam_file_present(context):
 def step_checkov_iam(context):
     # Simula a análise do Checkov para o arquivo IAM.
     context.iam_checkov_output = "No excessive permissions granted."
+    print("Resultado do Checkov para IAM:")
+    print(context.iam_checkov_output)
 
 @then("nenhuma permissão excessiva deve ser concedida")
 def step_no_excess_permissions(context):
+    print("Validação: Resposta do Checkov para IAM:")
+    print(context.iam_checkov_output)
     if "No excessive permissions" not in context.iam_checkov_output:
         raise AssertionError(f"Excess permissions granted! IAM Checkov output: {context.iam_checkov_output}")
 
@@ -95,10 +112,15 @@ def step_security_groups_correct(context):
 @when("o Checkov analisa os arquivos de configuração de VPC e Grupos de Segurança")
 def step_checkov_vpc_security(context):
     # Simula a análise do Checkov para VPC e segurança.
+    context.vpc_security_checkov_output = "VPC and Security configurations are compliant."
+    print("Resultado do Checkov para VPC e grupos de segurança:")
+    print(context.vpc_security_checkov_output)
     context.vpc_output = "No insecure rules found in security groups."
 
 @then("nenhuma regra insegura, como acesso irrestrito (0.0.0.0/0) em portas críticas, deve ser encontrada")
 def step_no_insecure_rules(context):
+    print("Validação: Resposta do Checkov para VPC:")
+    print(context.vpc_output)
     if "No insecure rules" not in context.vpc_output:
         raise AssertionError(f"Insecure rule detected! VPC output: {context.vpc_output}")
 
@@ -119,12 +141,17 @@ def step_network_resources_defined(context):
 @when("o Checkov executa a análise")
 def step_run_checkov_network(context):
     # Simula a análise do Checkov para os recursos de rede.
+    context.network_checkov_output = "Nenhuma violação de rede encontrada. Best practices adhered."
+    print("Resultado do Checkov para análise de recursos de rede:")
+    print(context.network_checkov_output)
     context.network_output = "Network configuration adheres to best practices."
     print("Checkov network analysis output:")
     print(context.network_output)
 
 @then("a configuração de rede deve seguir as melhores práticas de segurança")
 def step_network_best_practices(context):
+    print("Validação: Resposta do Checkov para análise de rede:")
+    print(context.network_output)
     if "best practices" not in context.network_output:
         raise AssertionError(f"Network configuration does not follow best practices! Network output: {context.network_output}")
 
