@@ -1,6 +1,4 @@
-Perfeito! Com base no seu stack e nos fluxos que discutimos, aqui está uma **arquitetura de infraestrutura detalhada** para sua plataforma `bot_freqtrade_strategies`, incluindo os componentes AWS, Kubernetes, Helm, GitOps com ArgoCD, Freqtrade services e a sua **Facade API** que interage com a blockchain e gerencia os bots.
-
----
+# Infra
 
 Requisito:
 
