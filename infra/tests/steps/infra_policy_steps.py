@@ -10,7 +10,9 @@ def step_setup_environment(context):
 
 @given('que a infraestrutura está definida como código no diretório "infra/terraform"')
 def step_infra_defined(context):
-    assert os.path.isdir("../infra/terraform"), "Diretório infra/terraform não existe"
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    terra_dir = os.path.join(base_dir, "infra", "terraform")
+    assert os.path.isdir(terra_dir), "Diretório infra/terraform não existe"
     context.infra_defined = True
 
 @given("que o Checkov está instalado e configurado no ambiente")
@@ -36,7 +38,9 @@ def step_best_practices(context):
 
 @given("que o arquivo \"infra/terraform/iam.tf\" está presente")
 def step_iam_file_present(context):
-    assert os.path.isfile("../infra/terraform/iam.tf"), "Arquivo iam.tf não encontrado"
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    iam_file = os.path.join(base_dir, "infra", "terraform", "iam.tf")
+    assert os.path.isfile(iam_file), "Arquivo iam.tf não encontrado"
     context.iam_file_present = True
 
 @when("o Checkov analisa o arquivo de configuração IAM")
@@ -74,8 +78,11 @@ def step_ports_configured(context):
 
 @given('que os recursos de rede estão definidos em "infra/terraform/vpc.tf" e "infra/terraform/main.tf"')
 def step_network_resources_defined(context):
-    assert os.path.isfile("../infra/terraform/vpc.tf"), "Arquivo vpc.tf não encontrado"
-    assert os.path.isfile("../infra/terraform/main.tf"), "Arquivo main.tf não encontrado"
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    vpc_file = os.path.join(base_dir, "infra", "terraform", "vpc.tf")
+    main_file = os.path.join(base_dir, "infra", "terraform", "main.tf")
+    assert os.path.isfile(vpc_file), "Arquivo vpc.tf não encontrado"
+    assert os.path.isfile(main_file), "Arquivo main.tf não encontrado"
     context.network_resources_defined = True
 
 @when("o Checkov executa a análise")
