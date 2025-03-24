@@ -1,5 +1,14 @@
 # Testes de Infraestrutura
 
+# Video de apresentação do projeto
+
+https://youtu.be/VlsiToWdZEE
+
+
+[![Assista ao vídeo](https://img.youtube.com/vi/VlsiToWdZEE/0.jpg)](https://youtu.be/VlsiToWdZEE)
+
+
+
 Este documento descreve as definições e diretrizes para a execução dos testes de infraestrutura do projeto "bot_freqtrade_strategies". Aqui, detalhamos como a infraestrutura funciona e os passos necessários para testar e validar este ambiente.
 
 ## Definições de Infraestrutura
