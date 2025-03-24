@@ -56,7 +56,7 @@ def step_verifica_arquivos(context):
 
 @when(u'executar o comando "terraform plan" na pasta "infra/terraform"')
 def step_terraform_plan(context):
-    terraform_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "infra", "terraform"))
+    terraform_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "infra", "terraform"))
     try:
         result = subprocess.run(["terraform", "plan"], cwd=terraform_dir, check=True, capture_output=True, text=True)
         context.terraform_plan_output = result.stdout
@@ -72,7 +72,7 @@ def step_verifica_terraform_plan(context):
 
 @when(u'executar o comando "terraform apply" na pasta "infra/terraform" com aprovação automática')
 def step_terraform_apply(context):
-    terraform_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "infra", "terraform"))
+    terraform_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "infra", "terraform"))
     try:
         result = subprocess.run(["terraform", "apply", "-auto-approve"], cwd=terraform_dir, check=True, capture_output=True, text=True)
         context.terraform_apply_output = result.stdout
