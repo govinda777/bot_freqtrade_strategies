@@ -530,4 +530,19 @@ sequenceDiagram
 
 Esta arquitetura proporciona uma plataforma escalável, segura e automatizada para gerenciar múltiplos bots Freqtrade para diferentes clientes. Utilizando AWS EKS, RDS, Terraform, Helm, ArgoCD e GitHub Actions, a infraestrutura é definida como código e operada com GitOps, garantindo consistência e facilidade de manutenção.
 
+## 9. Visão Geral Atualizada
+
+A seguir, um diagrama que sintetiza a infraestrutura do projeto de forma consolidada:
+
+```mermaid
+flowchart LR
+    A[Provisionamento com Terraform] --> B[AWS EKS Cluster]
+    B --> C[Pods Freqtrade]
+    C --> D[Execução de Backtest e Trade]
+    C --> E[Conexão com RDS (PostgreSQL)]
+    B --> F[ArgoCD & Helm]
+    F --> C
+    G[CI/CD Pipeline com GitHub Actions] --> F
+```
+
 Caso precise de mais detalhes ou de scripts/templates adicionais, estou à disposição para ajudar!
