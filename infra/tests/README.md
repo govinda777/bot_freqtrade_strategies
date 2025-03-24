@@ -7,6 +7,8 @@ https://youtu.be/VlsiToWdZEE
 
 [![Assista ao vídeo](https://img.youtube.com/vi/VlsiToWdZEE/0.jpg)](https://youtu.be/VlsiToWdZEE)
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/VlsiToWdZEE" frameborder="0" allowfullscreen></iframe>
+
 
 
 Este documento descreve as definições e diretrizes para a execução dos testes de infraestrutura do projeto "bot_freqtrade_strategies". Aqui, detalhamos como a infraestrutura funciona e os passos necessários para testar e validar este ambiente.
