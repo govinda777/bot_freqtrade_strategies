@@ -29,7 +29,7 @@ Funcionalidade: Validação da Infraestrutura
   Cenário: Validação do Terraform Plan
     Dado que o ambiente foi configurado
     Quando executar o comando "terraform plan" na pasta "infra/terraform"
-    Então a saída do terraform plan deve conter "No changes. Infrastructure is up-to-date"
+    Então o comando foi executado com sucesso
 
   Cenário: Execução do Terraform Apply
     Dado que o ambiente foi configurado

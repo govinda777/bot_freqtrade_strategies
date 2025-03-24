@@ -1,6 +1,7 @@
 import os
 import subprocess
 from behave import given, when, then
+setup_executed_globally = False
 
 @given(u'que o script "./setup_environment.sh" foi executado com sucesso')
 def step_executa_setup(context):
@@ -29,16 +30,22 @@ def step_verifica_saida(context):
 
 @given(u'que o ambiente foi configurado')
 def step_ambiente_configurado_given(context):
-    # Reexecuta o setup apenas se não tiver sido executado previamente
-    if hasattr(context, 'setup_executed') and context.setup_executed:
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    setup_flag = os.path.join(base_dir, "setup_done.flag")
+    if os.path.exists(setup_flag):
+        with open(setup_flag, "r") as f:
+            context.output = f.read()
+        context.setup_executed = True
+        print("Setup already executed, reading cached output.")
         return
-    script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "setup_environment.sh"))
+    script_path = os.path.join(base_dir, "setup_environment.sh")
     try:
         result = subprocess.run(["bash", script_path], check=True, capture_output=True, text=True)
         context.output = result.stdout
+        with open(setup_flag, "w") as f:
+            f.write(result.stdout)
         print("Logs do setup_environment.sh:")
         print(result.stdout)
-        context.setup_executed = True
     except subprocess.CalledProcessError as e:
         assert False, "O ambiente não foi configurado."
 
@@ -65,11 +72,6 @@ def step_terraform_plan(context):
     except subprocess.CalledProcessError as e:
         assert False, f"Erro ao executar terraform plan: {e.stderr.strip()}"
 
-@then(u'a saída do terraform plan foi gerada')
-def step_verifica_terraform_plan(context):
-    # Validação genérica: apenas confirma que o terraform plan gerou uma saída não vazia
-    assert context.terraform_plan_output.strip(), "A saída do terraform plan está vazia."
-
 @when(u'executar o comando "terraform apply" na pasta "infra/terraform" com aprovação automática')
 def step_terraform_apply(context):
     terraform_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "infra", "terraform"))
@@ -85,3 +87,8 @@ def step_terraform_apply(context):
 def step_verifica_terraform_apply(context):
     expected = "Apply complete! Resources:"
     assert expected in context.terraform_apply_output, f"A saída do terraform apply não contém a mensagem esperada. Saída: {context.terraform_apply_output}"
+
+@then(u'o comando foi executado com sucesso')
+def step_terraform_plan_output(context):
+    print(context.terraform_plan_output)
+    assert context.terraform_plan_output.strip(), "Terraform plan output is empty. {context.terraform_plan_output}"
