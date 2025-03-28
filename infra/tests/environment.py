@@ -21,4 +21,4 @@ def after_all(context):
     """
     Finaliza e remove o container Localstack após a execução de todos os testes.
     """
-    localstack_manager.stop_localstack_container()
+    pass
