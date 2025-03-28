@@ -31,9 +31,11 @@ def step_executa_setup(context):
 def step_ambiente_configurado(context):
     assert getattr(context, "output", None), "Ambiente não está configurado."
 
-@then(u'a saída deve conter "Ambiente configurado com sucesso"')
-def step_verifica_saida(context):
-    assert "Ambiente configurado com sucesso" in context.output
+@then(u'a saída deve conter "{expected}"')
+def step_check_output_contains(context, expected):
+    output = getattr(context, "terraform_providers_output", "")
+    assert expected in output, f'Esperado "{expected}" na saída, mas obtido: {output}'
+
 
 @given(u'que o ambiente foi configurado')
 def step_ambiente_configurado_given(context):

@@ -8,7 +8,7 @@ if [ -z "$AWS_VERSION" ]; then
     exit 1
 fi
 
-# Força valores padrão se não estiverem no ambiente
+# Define os valores padrão se não estiverem definidos
 AWS_PROVIDER_VERSION="$AWS_VERSION"
 KUBERNETES_PROVIDER_VERSION="${KUBERNETES_PROVIDER_VERSION:-~> 2.20}"
 HELM_PROVIDER_VERSION="${HELM_PROVIDER_VERSION:-~> 2.10}"
